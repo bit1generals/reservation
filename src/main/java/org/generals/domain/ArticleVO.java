@@ -7,4 +7,5 @@ public class ArticleVO {
 
 	private Long rno;
 	private String aname, serial, type;
+	private int count;
 }

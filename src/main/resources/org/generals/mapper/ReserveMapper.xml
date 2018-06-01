@@ -9,17 +9,20 @@
 	<insert id="insertReserve">
 		insert into tbl_reserve_list (hno, id, reservedate,
 		state, starttime, endtime)
-		values (#{hno},#{id},#{reservedate},#{state},#{starttime},#{endtime})
+		values
+		(#{hno},#{id},#{reservedate},#{state},#{starttime},#{endtime})
 	</insert>
 
 	<insert id="insertReserveArticle">
-		insert into tbl_reserve_article_list (rno, serial, type)
+		insert into tbl_reserve_article_list (rno, serial,
+		type)
 		values (#{rno},#{serial},#{type})
 	</insert>
-	
+
 	<select id="selectTime" resultType="org.generals.domain.ReserveVO">
-		select starttime, endtime from tbl_reserve_list where hno=1 and reservedate='2018-05-30' and state='D';
+		select starttime, endtime from tbl_reserve_list where hno=#{hno} and
+		reservedate=#{reservedate} and state=#{state}
 	</select>
-	
-	
+
+
 </mapper>
