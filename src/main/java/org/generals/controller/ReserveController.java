@@ -22,13 +22,12 @@ public class ReserveController {
 	@Setter(onMethod_ = { @Autowired })
 	private ReserveService service;
 	
-	@PostMapping(value = "/reserve/timeData", produces = "application/json;charset=UTF-8")
+	@PostMapping(value = "/reserve/timeData", produces = "application/json")
 	public ResponseEntity<List<ReserveVO>> getTimeData(@RequestBody ReserveVO vo) {
 		log.info("getTimeData call......");
 		log.info("vo : "+vo);
 		vo.setState("D");
 		List<ReserveVO> timeDataList = service.getTimeData(vo);
-		timeDataList.forEach(timeData -> log.info(timeData));
 		return new ResponseEntity<List<ReserveVO>>(timeDataList, HttpStatus.OK);
 	}
 }

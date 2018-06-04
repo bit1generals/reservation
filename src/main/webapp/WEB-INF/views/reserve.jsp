@@ -104,21 +104,34 @@
 </section>
 <%@include file="./includes/footer.jsp"%>
 <script>
+
+var startTimeList = [];
 	function handler(event) {
-		var formData = new FormData();
-		formData.append("hno", $('select[name="hno"] option:selected').val());
-		formData.append("reservedate", event.target.value);
-		console.dir(formData);
+
+		var obj = {
+			"hno" : $('select[name="hno"] option:selected').val(),
+			"reservedate" : event.target.value + " 00"
+		};
+
 		$.ajax({
 			url : '/reserve/timeData',
-			method : 'post',
-			data : formData,
+			type : 'post',
+			data : JSON.stringify(obj),
 			dataType : 'json',
 			processData : false,
-			contentType : false,
+			contentType : "application/json;charset=UTF-8",
 			success : function(timeDataList) {
 				console.log("Hall and Date Select");
 				console.dir(timeDataList);
+				var targetList = $(timeDataList);
+				targetList.each(function(index, item) {
+					var start = new Date(item.starttime).getHours();
+					var end = new Date(item.endtime).getHours();
+					startTimeList.push(start);
+				});
+				console.dir(startTimeList);
+
+				
 			}
 		});
 	};
