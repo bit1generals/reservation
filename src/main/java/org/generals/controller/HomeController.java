@@ -2,6 +2,7 @@ package org.generals.controller;
 
 import java.util.Locale;
 
+import org.generals.domain.ArticleVO;
 import org.generals.domain.ReserveVO;
 import org.generals.service.ReserveService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ public class HomeController {
 	public void reservePost(ReserveVO reserveVO) {
 		log.info("reservePost()... call");
 		log.info("reserveVO : " + reserveVO);
+		service.insertReserve(reserveVO);
 	}
 	
 	

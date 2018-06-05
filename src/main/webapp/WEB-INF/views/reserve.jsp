@@ -30,19 +30,14 @@
 						<div class="field half">
 							<label for="department">Date</label>
 							<div class="select-wrapper">
-								<input type="date" name="reservedate" onchange="handler(event);" />
+								<input type="date" id="reservedate" name="reservedate" />
 							</div>
 						</div>
 
 						<div class="field half first">
 							<label for="department">Start Time</label>
 							<div class="select-wrapper">
-								<select name="startTime" id="department">
-									<option value="2018-06-01 00:00:00">-</option>
-									<option value="2018-06-01 09:00:00">9:00</option>
-									<option value="2018-06-01 10:00:00">10:00</option>
-									<option value="2018-06-01 11:00:00">11:00</option>
-									<option value="2018-06-01 12:00:00">12:00</option>
+								<select name="startTime" id="startTime">
 								</select>
 							</div>
 						</div>
@@ -50,12 +45,9 @@
 						<div class="field half">
 							<label for="department">End Time</label>
 							<div class="select-wrapper">
-								<select name="endTime" id="department">
+								<select name="endTime" id="endTime">
 									<option value="2018-06-01 00:00:00">-</option>
-									<option value="2018-06-01 09:00:00">9:00</option>
-									<option value="2018-06-01 02:00:00">10:00</option>
-									<option value="2018-06-01 11:00:00">11:00</option>
-									<option value="2018-06-01 12:00:00">12:00</option>
+
 								</select>
 							</div>
 						</div>
@@ -63,8 +55,8 @@
 						<div class="field four first">
 							<label for="department">Article</label>
 							<div class="select-wrapper">
-								<select name="list[0].type" id="department">
-									<option value="">-</option>
+								<select name="list[0].type" id="type">
+									<option value="">None</option>
 									<option value="M">MicroPhone</option>
 									<option value="W">WhiteBoard</option>
 									<option value="N">NoteBook</option>
@@ -75,7 +67,8 @@
 						<div class="field four">
 							<label for="department">Count</label>
 							<div class="select-wrapper">
-								<select name="list[0].count" id="department">
+								<select name="list[0].count" id="count">
+									<option value="0">0</option>
 									<option value="1">1</option>
 									<option value="2">2</option>
 									<option value="3">3</option>
@@ -104,10 +97,34 @@
 </section>
 <%@include file="./includes/footer.jsp"%>
 <script>
+	var impossibleTime = [];
+	var reservedate = $("#reservedate");
+	var startTime = $("#startTime");
+	var endTime = $("#endTime");
 
-var startTimeList = [];
-	function handler(event) {
+	// get end time event
+	startTime.change(function(event) {
+		endTime.empty();
+		console.log("start change");
+		var start = new Date(this.value).getHours();
+		console.log("start " + start);
+ 		var end = findEndTime(start);
+		console.log("end " + end);
+ 		var date = reservedate.val();
+		console.log("date " + date);
+		for(start += 1; start <= end ;start++){
+			console.log("for in start" + start);
+			endTime.append('<option value="' + date + ' ' + ('00' + start).slice(-2) + ':00:00">' + start
+					+ ':00</option>');
 
+		};
+
+	});
+	
+	// get date event
+	reservedate.change(function handler(event) {
+		init();
+		
 		var obj = {
 			"hno" : $('select[name="hno"] option:selected').val(),
 			"reservedate" : event.target.value + " 00"
@@ -121,18 +138,56 @@ var startTimeList = [];
 			processData : false,
 			contentType : "application/json;charset=UTF-8",
 			success : function(timeDataList) {
-				console.log("Hall and Date Select");
-				console.dir(timeDataList);
 				var targetList = $(timeDataList);
 				targetList.each(function(index, item) {
 					var start = new Date(item.starttime).getHours();
 					var end = new Date(item.endtime).getHours();
-					startTimeList.push(start);
+					collectTime(start, end);
 				});
-				console.dir(startTimeList);
-
-				
+				makeStartTime();
 			}
 		});
+
+	});
+
+	function collectTime(start, end) {
+
+		for (start; start < end; start++) {
+			impossibleTime.push(start);
+		}
+	};
+	function makeStartTime() {
+		var date = reservedate.val();
+		startTime.append('<option value="-">-</option>');
+		for (var num = 9; num < 21; num++) {
+			
+			
+			
+			startTime.append('<option value="' + date + ' ' + ('00' + num).slice(-2) + ':00:00"'
+					+ (impossibleTime.includes(num) ? 'disabled="disabled"' : '') + '">' + num
+					+ ':00</option>');
+		};
+	};
+	
+	function init() {
+		impossibleTime = [];
+		startTime.empty();
+		endTime.empty();
+	};
+	
+	function findEndTime(start) {
+		console.dir(impossibleTime);
+		if(impossibleTime[0] == null){
+			return 21;
+		}
+		impossibleTime.push(start);
+		impossibleTime.sort();
+		console.dir(impossibleTime);
+		var idx = impossibleTime.indexOf(start);
+		if(impossibleTime[idx] == 20){
+			return 21;
+		}
+		
+		return impossibleTime[idx+1];
 	};
 </script>

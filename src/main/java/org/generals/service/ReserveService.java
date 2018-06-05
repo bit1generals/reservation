@@ -2,6 +2,7 @@ package org.generals.service;
 
 import java.util.List;
 
+import org.generals.domain.ArticleVO;
 import org.generals.domain.HallVO;
 import org.generals.domain.ReserveVO;
 import org.generals.mapper.ReserveMapper;
@@ -18,6 +19,11 @@ public class ReserveService {
 	@Setter(onMethod_ = { @Autowired })
 	private ReserveMapper mapper;
 	
+	
+	public void insertReserve(ReserveVO vo) {
+		mapper.insertReserve(vo);
+		mapper.insertReserveArticle(vo.getArticleList());
+	}
 	
 	public List<HallVO> getHall(){
 		log.info("get Hall...........................");

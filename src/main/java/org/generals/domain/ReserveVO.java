@@ -23,7 +23,7 @@ public class ReserveVO {
 	private Date regdate, updatedate;
 	private Timestamp starttime, endtime;
 
-	private List<ArticleVO> list;
+	private List<ArticleVO> articleList;
 
 	public void setStartTime(String starttime) {
 		this.starttime = Timestamp.valueOf(starttime);

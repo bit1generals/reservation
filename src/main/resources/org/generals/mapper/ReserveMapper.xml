@@ -14,14 +14,32 @@
 	</insert>
 
 	<insert id="insertReserveArticle">
-		insert into tbl_reserve_article_list (rno, serial,
-		type)
-		values (#{rno},#{serial},#{type})
+		<selectKey order="BEFORE" keyProperty="rno" resultType="int">
+			select max(rno) from
+			tbl_reserve_list
+		</selectKey>
+
+		insert into tbl_reserve_article_list (rno, serial, type) values
+		<foreach collection="articleList" open="(" close=")" separator="," item="articleVO">
+			<foreach collection="articleVO.serials" item="serial">
+				#{rno},#{serial},#{articleVO.type}
+			</foreach>
+		</foreach>
+
 	</insert>
 
+	<!-- <insert id="insertReserveArticle"> <selectKey order="BEFORE" keyColumn="rno"> 
+		select max(rno) from tbl_reserve_list </selectKey> insert into tbl_reserve_article_list 
+		(rno, serial, type) values <foreach collection="articleList" open="(" close=")" 
+		separator="," item="articleVO" , index="i"> <foreach collection="articleVO.serials" 
+		item="serial"> #{rno},#{articleVO.serials[i]},#{articleVO.type} </foreach> 
+		</foreach> </insert> -->
+
 	<select id="selectTime" resultType="org.generals.domain.ReserveVO">
-		select starttime, endtime from tbl_reserve_list where hno=#{hno} and
-		reservedate=#{reservedate} and state=#{state}
+		select starttime, endtime
+		from tbl_reserve_list where hno=#{hno} and
+		reservedate=#{reservedate}
+		and state=#{state}
 	</select>
 
 
