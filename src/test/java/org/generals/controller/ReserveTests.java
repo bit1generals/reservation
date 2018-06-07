@@ -22,7 +22,7 @@ public class ReserveTests {
 	@Autowired
 	ReserveMapper mapper;
 	
-	@Test
+/*	@Test
 	public void insertTest() {
 		ReserveVO vo = new ReserveVO();
 		vo.setHno(1L);
@@ -34,7 +34,7 @@ public class ReserveTests {
 		
 		mapper.insertReserve(vo);
 		
-	}
+	}*/
 	
 	@Test
 	public void selectTest() {

@@ -31,6 +31,17 @@ public class ReserveService {
 	}
 	
 	public List<ReserveVO> getTimeData(ReserveVO vo){
+		log.info("get Time Data........................");
 		return mapper.selectTime(vo);
+	}
+	
+	public List<ArticleVO> getArticle(){
+		log.info("get Article........................");
+		return mapper.selectArticle();
+	}
+	
+	public ArticleVO getReserveArticle(ReserveVO vo, String type) {
+		log.info("get Reserve Article........................");
+		return mapper.selectReserveArticle(vo, type);
 	}
 }

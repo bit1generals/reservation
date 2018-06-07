@@ -33,12 +33,15 @@ public class HomeController {
 	public void reserve(Model model) {
 		log.info("reserve()... call");
 		model.addAttribute("hallList", service.getHall());
+		model.addAttribute("articleList", service.getArticle());
 	}
 	
 	@PostMapping("/reserve")
 	public void reservePost(ReserveVO reserveVO) {
 		log.info("reservePost()... call");
 		log.info("reserveVO : " + reserveVO);
+		reserveVO.setId("user10");
+		reserveVO.setState("D");
 		service.insertReserve(reserveVO);
 	}
 	

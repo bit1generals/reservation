@@ -20,7 +20,8 @@
 		</selectKey>
 
 		insert into tbl_reserve_article_list (rno, serial, type) values
-		<foreach collection="articleList" open="(" close=")" separator="," item="articleVO">
+		<foreach collection="articleList" open="(" close=")"
+			separator="," item="articleVO">
 			<foreach collection="articleVO.serials" item="serial">
 				#{rno},#{serial},#{articleVO.type}
 			</foreach>
@@ -42,5 +43,31 @@
 		and state=#{state}
 	</select>
 
+	<select id="selectArticle" resultType="org.generals.domain.ArticleVO">
+		select * from tbl_article
+	</select>
+
+	<select id="selectReserveArticle" resultMap="getReserveArticleSerials">
+		<![CDATA[
+		select *
+		from tbl_article_list
+		where type = #{reserveVO.type} and serial not in
+		(select serial
+		from
+		(select rno
+		from tbl_reserve_list
+		where state=#{reserveVO.state} and not (starttime > #{reserveVO.endtime} or endtime <=
+		#{reserveVO.starttime})) reserve inner join tbl_reserve_article_list
+		article
+		on reserve.rno = article.rno)
+		]]>
+	</select>
+
+	<resultMap type="org.generals.domain.ArticleVO" id="getReserveArticleSerials">
+		<id column="type" />
+		<collection property="serials" ofType="java.lang.String" javaType="java.util.ArrayList">
+			<result column="serial" />
+		</collection>
+	</resultMap>
 
 </mapper>

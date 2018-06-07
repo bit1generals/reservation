@@ -57,10 +57,10 @@
 							<div class="select-wrapper">
 								<select name="list[0].type" id="type">
 									<option value="">None</option>
-									<option value="M">MicroPhone</option>
-									<option value="W">WhiteBoard</option>
-									<option value="N">NoteBook</option>
-									<option value="S">Speaker</option>
+									<c:forEach items="${articleList}" var="articleVO">
+										<option value="${articleVO.type}">${articleVO.aname}</option>
+									</c:forEach>
+
 								</select>
 							</div>
 						</div>
@@ -101,22 +101,43 @@
 	var reservedate = $("#reservedate");
 	var startTime = $("#startTime");
 	var endTime = $("#endTime");
-
+	var type = $("#type");
+	
+	type.change(function(event) {
+		
+		console.log("start and end");
+		console.log(startTime.val());
+		var obj = {
+			"starttime" : startTime.val(),
+			"endtime" : endTime.val(),
+			"type" : type.val()
+		};
+		
+		console.dir(obj);
+		
+	 	$.ajax({
+			url : '/reserve/articleData',
+			type : 'post',
+			data : JSON.stringify(obj),
+			dataType : 'json',
+			processData : false,
+			contentType : "application/json;charset=UTF-8",
+			success : function(articleVO) {
+				console.dir(articleVO);
+			} 
+		});
+	});
+	
+	
 	// get end time event
 	startTime.change(function(event) {
 		endTime.empty();
-		console.log("start change");
 		var start = new Date(this.value).getHours();
-		console.log("start " + start);
  		var end = findEndTime(start);
-		console.log("end " + end);
  		var date = reservedate.val();
-		console.log("date " + date);
 		for(start += 1; start <= end ;start++){
-			console.log("for in start" + start);
 			endTime.append('<option value="' + date + ' ' + ('00' + start).slice(-2) + ':00:00">' + start
 					+ ':00</option>');
-
 		};
 
 	});
@@ -142,6 +163,10 @@
 				targetList.each(function(index, item) {
 					var start = new Date(item.starttime).getHours();
 					var end = new Date(item.endtime).getHours();
+					/* var start = item.starttime;
+					var end = item.endtime; */
+					console.log(start);
+					console.log(end);
 					collectTime(start, end);
 				});
 				makeStartTime();
@@ -151,18 +176,19 @@
 	});
 
 	function collectTime(start, end) {
-
+		console.log("222222222222222222222");
+		
 		for (start; start < end; start++) {
 			impossibleTime.push(start);
 		}
+		console.dir(impossibleTime);
 	};
 	function makeStartTime() {
 		var date = reservedate.val();
 		startTime.append('<option value="-">-</option>');
+		console.log("111111111111111111111");
+		console.dir(impossibleTime);
 		for (var num = 9; num < 21; num++) {
-			
-			
-			
 			startTime.append('<option value="' + date + ' ' + ('00' + num).slice(-2) + ':00:00"'
 					+ (impossibleTime.includes(num) ? 'disabled="disabled"' : '') + '">' + num
 					+ ':00</option>');
@@ -175,19 +201,37 @@
 		endTime.empty();
 	};
 	
+	
+	
 	function findEndTime(start) {
-		console.dir(impossibleTime);
-		if(impossibleTime[0] == null){
+		var result = 21;
+		if (impossibleTime[0] != null) {
+			impossibleTime.sort((a, b) => a - b);
+			impossibleTime.some (imptime => {
+				if(start < imptime){
+					result = imptime;
+					return result;					
+				};
+			});
+		};
+		return result;
+		};
+		
+		/* if(impossibleTime[0] == null){
 			return 21;
 		}
+		
 		impossibleTime.push(start);
-		impossibleTime.sort();
-		console.dir(impossibleTime);
+		impossibleTime.sort((a, b) => a - b);
+
 		var idx = impossibleTime.indexOf(start);
+		
 		if(impossibleTime[idx] == 20){
 			return 21;
 		}
 		
-		return impossibleTime[idx+1];
-	};
+		var result = impossibleTime[idx+1];
+		impossibleTime.splice(idx,1);
+		return result;
+	}; */
 </script>

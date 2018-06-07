@@ -11,10 +11,16 @@ public interface ReserveMapper {
 
 	public List<HallVO> selectHall();
 	
+	public List<ArticleVO> selectArticle();
+	
 	public void insertReserve(ReserveVO vo);
 	
 	public void insertReserveArticle(@Param("articleList") List<ArticleVO> vo);
 	
 	public List<ReserveVO> selectTime(ReserveVO vo);
+	
+	public ArticleVO selectReserveArticle(@Param("reserveVO")ReserveVO vo, @Param("type")String type);
+	
+	
 }
 
