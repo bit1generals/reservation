@@ -2,7 +2,11 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@include file="./includes/header.jsp"%>
-
+<style>
+	.show{
+		display: none;
+	}
+</style>
 <section class="wrapper style1">
 	<div class="inner">
 		<div class="index align-left">
@@ -14,7 +18,7 @@
 				<div class="content">
 
 					<form method="post" action="/reserve">
-
+						
 						<div class="field half first">
 							<label for="department">Lecture Room</label>
 							<div class="select-wrapper">
@@ -34,7 +38,7 @@
 							</div>
 						</div>
 
-						<div class="field half first">
+						<div class="field half first secondRow">
 							<label for="department">Start Time</label>
 							<div class="select-wrapper">
 								<select name="startTime" id="startTime">
@@ -42,49 +46,49 @@
 							</div>
 						</div>
 
-						<div class="field half">
+						<div class="field half secondRow">
 							<label for="department">End Time</label>
 							<div class="select-wrapper">
 								<select name="endTime" id="endTime">
 									<option value="2018-06-01 00:00:00">-</option>
-
 								</select>
 							</div>
 						</div>
 
-						<div class="field four first">
+						<div class="field four first thirdRow">
 							<label for="department">Article</label>
 							<div class="select-wrapper">
-								<select name="list[0].type" id="type">
-									<option value="">None</option>
+								<select name="type" id="type">
+									<option value="none">None</option>
 									<c:forEach items="${articleList}" var="articleVO">
-										<option value="${articleVO.type}">${articleVO.aname}</option>
+										<option value="${articleVO.type}"
+											data-aname="${articleVO.aname}">${articleVO.aname}</option>
 									</c:forEach>
-
 								</select>
 							</div>
 						</div>
-						<div class="field four">
+
+
+						<div class="field four thirdRow">
 							<label for="department">Count</label>
 							<div class="select-wrapper">
-								<select name="list[0].count" id="count">
-									<option value="0">0</option>
-									<option value="1">1</option>
-									<option value="2">2</option>
-									<option value="3">3</option>
-									<option value="4">4</option>
+								<select name="count" id="count">
 								</select>
 							</div>
 						</div>
 
+						<div class="articleArea field four half thirdRow">
+							<ul class="articleList"></ul>
+						</div>
 
-						<div class="field">
+
+						<div class="field fourthRow">
 							<label for="message">Message</label>
 							<textarea name="message" id="message" rows="6"
 								style="resize: none"></textarea>
 						</div>
 
-						<ul class="actions">
+						<ul class="actions fifthRow">
 							<li><input type="submit" id="submit" value="Reservation"></li>
 							<li><input type="reset" id="reset" value="Reset"></li>
 							<li><input type="button" id="cancel" value="Cancel"></li>
@@ -97,23 +101,36 @@
 </section>
 <%@include file="./includes/footer.jsp"%>
 <script>
+	
 	var impossibleTime = [];
+	var serials = [];
+	var serial = [];
 	var reservedate = $("#reservedate");
 	var startTime = $("#startTime");
 	var endTime = $("#endTime");
 	var type = $("#type");
+	var count = $("#count");
+	var articleList = $(".articleList");
+	$(".articleList").on("click","span", function(event) {
+		console.dir($(this).parent("li").remove());
+	});
+	
+	count.change(function(event) {
+		var value = this.value;
+		if(value === 0){
+			return;
+		}
+		makeArticleList(value);
+	});
 	
 	type.change(function(event) {
-		
-		console.log("start and end");
-		console.log(startTime.val());
+		serials = [];
+		count.empty();
 		var obj = {
 			"starttime" : startTime.val(),
 			"endtime" : endTime.val(),
 			"type" : type.val()
 		};
-		
-		console.dir(obj);
 		
 	 	$.ajax({
 			url : '/reserve/articleData',
@@ -123,7 +140,8 @@
 			processData : false,
 			contentType : "application/json;charset=UTF-8",
 			success : function(articleVO) {
-				console.dir(articleVO);
+				serials = articleVO.serials;
+				makeCount();
 			} 
 		});
 	});
@@ -142,9 +160,14 @@
 
 	});
 	
+	endTime.change(function(event) {
+		$(".thirdRow").show();
+	});
+	
 	// get date event
 	reservedate.change(function handler(event) {
 		init();
+		$(".secondRow").show();
 		
 		var obj = {
 			"hno" : $('select[name="hno"] option:selected').val(),
@@ -160,7 +183,7 @@
 			contentType : "application/json;charset=UTF-8",
 			success : function(timeDataList) {
 				var targetList = $(timeDataList);
-				targetList.each(function(index, item) {
+				targetList.each(function(idx, item) {
 					var start = new Date(item.starttime).getHours();
 					var end = new Date(item.endtime).getHours();
 					/* var start = item.starttime;
@@ -175,19 +198,16 @@
 
 	});
 
-	function collectTime(start, end) {
-		console.log("222222222222222222222");
-		
+	function collectTime(start, end) {		
 		for (start; start < end; start++) {
 			impossibleTime.push(start);
 		}
-		console.dir(impossibleTime);
 	};
 	function makeStartTime() {
 		var date = reservedate.val();
+		
 		startTime.append('<option value="-">-</option>');
-		console.log("111111111111111111111");
-		console.dir(impossibleTime);
+		
 		for (var num = 9; num < 21; num++) {
 			startTime.append('<option value="' + date + ' ' + ('00' + num).slice(-2) + ':00:00"'
 					+ (impossibleTime.includes(num) ? 'disabled="disabled"' : '') + '">' + num
@@ -199,6 +219,13 @@
 		impossibleTime = [];
 		startTime.empty();
 		endTime.empty();
+		type.val("none");
+		count.empty();
+		articleList.empty();
+		$(".secondRow").hide();
+		$(".thirdRow").hide();
+		$(".fourthRow").hide();
+		
 	};
 	
 	
@@ -215,23 +242,25 @@
 			});
 		};
 		return result;
-		};
+	};
 		
-		/* if(impossibleTime[0] == null){
-			return 21;
-		}
+	function makeCount() {
+			for(var num = 0; num <= serials.length; num++){
+				count.append("<option value="+num+">"+num+"</option>");
+			}
+	};
+	
+	function makeArticleList(value) {
+		var articleName = $('select[name="type"] option:selected').data("aname");
 		
-		impossibleTime.push(start);
-		impossibleTime.sort((a, b) => a - b);
-
-		var idx = impossibleTime.indexOf(start);
+		articleList.children().each(function(idx,target) {
+			var existType = $(target).data("type");
+			if(type.val() === existType){
+				$(this).remove();
+			}
+		});
+		articleList.append("<li class='department' data-type='"+type.val()+"'>"+articleName+" : "+value+"ea <span>X</span></li>");	
+	};
 		
-		if(impossibleTime[idx] == 20){
-			return 21;
-		}
-		
-		var result = impossibleTime[idx+1];
-		impossibleTime.splice(idx,1);
-		return result;
-	}; */
+	
 </script>
