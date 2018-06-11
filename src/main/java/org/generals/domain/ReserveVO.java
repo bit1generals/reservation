@@ -22,16 +22,16 @@ public class ReserveVO {
 	private Date reservedate;
 	private Date regdate, updatedate;
 	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH")
-	private Timestamp starttime, endtime;
+	private Timestamp startTime, endTime;
 
 	private List<ArticleVO> articleList;
 
-	public void setStarttime(String starttime) {
-		this.starttime = Timestamp.valueOf(starttime);
+	public void setStartTime(String startTime) {
+		this.startTime = Timestamp.valueOf(startTime);
 	}
 
-	public void setEndtime(String endtime) {
-		this.endtime = Timestamp.valueOf(endtime);
+	public void setEndTime(String endTime) {
+		this.endTime = Timestamp.valueOf(endTime);
 	}
 
 	public String getReservedate() {

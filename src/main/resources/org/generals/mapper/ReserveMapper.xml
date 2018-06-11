@@ -8,9 +8,9 @@
 	</select>
 	<insert id="insertReserve">
 		insert into tbl_reserve_list (hno, id, reservedate,
-		state, starttime, endtime)
+		state, startTime, endTime)
 		values
-		(#{hno},#{id},#{reservedate},#{state},#{starttime},#{endtime})
+		(#{hno},#{id},#{reservedate},#{state},#{startTime},#{endTime})
 	</insert>
 
 	<insert id="insertReserveArticle">
@@ -37,7 +37,7 @@
 		</foreach> </insert> -->
 
 	<select id="selectTime" resultType="org.generals.domain.ReserveVO">
-		select starttime, endtime
+		select startTime, endTime
 		from tbl_reserve_list where hno=#{hno} and
 		reservedate=#{reservedate}
 		and state=#{state}
@@ -56,8 +56,8 @@
 		from
 		(select rno
 		from tbl_reserve_list
-		where state=#{reserveVO.state} and not (starttime > #{reserveVO.endtime} or endtime <=
-		#{reserveVO.starttime})) reserve inner join tbl_reserve_article_list
+		where state=#{reserveVO.state} and not (startTime > #{reserveVO.endTime} or endTime <=
+		#{reserveVO.startTime})) reserve inner join tbl_reserve_article_list
 		article
 		on reserve.rno = article.rno)
 		]]>
