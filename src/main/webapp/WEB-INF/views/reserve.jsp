@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@include file="./includes/header.jsp"%>
+<%@ include file="./includes/header.jsp"%>
 
 
 <style>
@@ -24,7 +24,7 @@
 						<div class="field half first firstRow">
 							<label for="department">Lecture Room</label>
 							<div class="select-wrapper">
-								<select name="hno" id="department">
+								<select name="hno" id="department" data-name="Lecture Room">
 									<c:forEach items="${hallList}" var="hallVO">
 										<option value="${hallVO.hno}">${hallVO.hname}
 											(${hallVO.maximum} person)</option>
@@ -36,7 +36,7 @@
 						<div class="field half firstRow">
 							<label for="department">Date</label>
 							<div class="select-wrapper">
-								<input type="text" id="reservedate" name="reservedate"
+								<input type="text" id="reservedate" name="reservedate" data-name="Date"
 									autocomplete="off" />
 							</div>
 						</div>
@@ -44,7 +44,7 @@
 						<div class="field half first secondRow">
 							<label for="department">Start Time</label>
 							<div class="select-wrapper">
-								<select name="startTime" id="startTime">
+								<select name="startTime" id="startTime" data-name="Start Time">
 								</select>
 							</div>
 						</div>
@@ -52,8 +52,7 @@
 						<div class="field half secondRow">
 							<label for="department">End Time</label>
 							<div class="select-wrapper">
-								<select name="endTime" id="endTime">
-									<option value="2018-06-01 00:00:00">-</option>
+								<select name="endTime" id="endTime" data-name="End Time">
 								</select>
 							</div>
 						</div>
@@ -111,7 +110,6 @@
 <script>
 	var impossibleTime = [];
 	var serials = [];
-	var serial = [];
 	var reservedate = $("#reservedate");
 	var startTime = $("#startTime");
 	var endTime = $("#endTime");
@@ -121,14 +119,39 @@
 	var firstRow = $(".firstRow");
 	var secondRow = $(".secondRow");
 	var thirdRow = $(".thirdRow select");
-	var submit = $("#submit");
+	var serialsMap = new Map();
+	
+	$('form').submit(function(event){
+		var form = $(this);
+ 		var submitAllow = false;
+		
+		$(".firstRow, .secondRow")
+			.find("input, select")
+			.each(function(idx,target){
+			 	var inputData = $(target);
+				console.log(inputData.data("name") + " in foreach"+inputData.val());
+				if (!$(target).val()){
+					alert(inputData.data("name")+"을 입력해주세요");
+					return submitAllow;
+				}
+		});
+		
+		$(".article").each(function(idx,target){
+			var type = $(target).data("type");
+			var count = $(target).data("count");
+			var serials = $(target).data("serials");
+			
+			form.append("<input type='hidden' name='articleList["+ idx +"].type' value='"+ type +"'/>");
+			
+			for(var i = 0; i < count; i++){
+				console.dir(serialsMap.get(type)[i]);
+				form.append("<input type='hidden' name='articleList["+ idx +"].serials["+ i +"]' value='"+ serialsMap.get(type)[i] +"'/>")
+			}
 
-	submit.on('click', function(e){
-		e.preventDefault();
-		//e.stopPropagation();
-		console.dir($(this).closest("form"));
-		console.dir(this.closest("form"));
-		//$(this).closest("form").submit();
+		});
+		submitAllow = true;
+		
+		return submitAllow;
 	});
 
 	$("#reservedate").datepicker({
@@ -155,11 +178,14 @@
 	});
 
 	count.change(function(event) {
-		var value = this.value;
+		var value = $(this).val();
 		if (value === 0) {
 			return;
 		}
+		serialsMap.set(type.val(), serials.slice());
+		console.dir(serialsMap);
 		makeArticleList(value);
+		
 	});
 
 	type.change(function(event) {
@@ -172,7 +198,7 @@
 		};
 
 		$.ajax({
-			url : '/reserve/articleData',
+			url : '/ajax/articleData',
 			type : 'post',
 			data : JSON.stringify(obj),
 			dataType : 'json',
@@ -213,7 +239,7 @@
 			};
 
 			$.ajax({
-				url : '/reserve/timeData',
+				url : '/ajax/timeData',
 				type : 'post',
 				data : JSON.stringify(obj),
 				dataType : 'json',
@@ -245,7 +271,7 @@
 	function makeStartTime() {
 		var date = reservedate.val();
 
-		startTime.append('<option value="-">-</option>');
+		startTime.append('<option></option>');
 
 		for (var num = 9; num < 21; num++) {
 			startTime.append('<option value="'
@@ -268,14 +294,18 @@
 		articleList.empty();
 		$(".secondRow").hide();
 		$(".thirdRow").hide();
+		
 	};
 
 	function findEndTime(start) {
 		var result = 21;
 		if (impossibleTime[0] != null) {
+			console.log(impossibleTime);
 			impossibleTime.sort(function(a, b) {
-				a - b
+				return a - b;
 			});
+			console.log(impossibleTime);
+
 			impossibleTime.some(function(imptime) {
 				if (start < imptime) {
 					result = imptime;
@@ -305,8 +335,8 @@
 			}
 		});
 		articleList
-				.append("<li class='department' data-type='" + type.val()
-						+ "'>" + articleName + " : " + value
+				.append("<li class='department article' data-type='" + type.val() + "' data-count='"+ value
+						+ "'>" + articleName + " : " + value 
 						+ "ea <span>X</span></li>");
 	};
 </script>

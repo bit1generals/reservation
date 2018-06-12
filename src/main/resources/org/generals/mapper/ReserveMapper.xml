@@ -20,10 +20,10 @@
 		</selectKey>
 
 		insert into tbl_reserve_article_list (rno, serial, type) values
-		<foreach collection="articleList" open="(" close=")"
+		<foreach collection="articleList" 
 			separator="," item="articleVO">
-			<foreach collection="articleVO.serials" item="serial">
-				#{rno},#{serial},#{articleVO.type}
+			<foreach collection="articleVO.serials" item="serial" separator=",">
+				( #{rno}, #{serial}, #{articleVO.type} )
 			</foreach>
 		</foreach>
 
