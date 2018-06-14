@@ -16,6 +16,8 @@ public class ReserveVO {
 
 	private Long rno, hno;
 	private String id, state, message, type;
+	
+	private HallVO hallVO;
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH")

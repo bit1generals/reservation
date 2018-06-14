@@ -24,6 +24,7 @@
 
 <!-- Scripts -->
 <script src="/resources/assets/js/jquery.min.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 <script src="/resources/assets/js/jquery.scrollex.min.js"></script>
 <script src="/resources/assets/js/jquery.scrolly.min.js"></script>
 <script src="/resources/assets/js/skel.min.js"></script>

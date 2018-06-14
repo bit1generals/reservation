@@ -8,6 +8,7 @@ import org.generals.service.ReserveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +43,12 @@ public class AjaxController {
 		vo.setState("D");
 		ArticleVO articleVO = service.getReserveArticle(vo, vo.getType());
 		return new ResponseEntity<ArticleVO>(articleVO, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/reserveArticleData", produces = "application/json")
+	public ResponseEntity<List<ArticleVO>> getReserveArticleData(Long rno){
+		List<ArticleVO> list = service.getArticleList(rno);
+		return new ResponseEntity<List<ArticleVO>>(list, HttpStatus.OK);
 	}
 	
 }

@@ -8,7 +8,7 @@
 							<h1>Hall Reservation</h1>
 							<p class="major">A (modular, highly tweakable) responsive one-page template designed by <a href="https://html5up.net">HTML5 UP</a> and released for free under the <a href="https://html5up.net/license">Creative Commons</a>.</p>
 							<ul class="actions vertical">
-								<li><a href="/reserve" class="button big wide smooth-scroll-middle">예약하기</a></li>
+								<li><a href="/reserve/register" class="button big wide smooth-scroll-middle">예약하기</a></li>
 							</ul>
 						</div>
 						<div class="image">

@@ -3,6 +3,7 @@ package org.generals.service;
 import java.util.List;
 
 import org.generals.domain.ArticleVO;
+import org.generals.domain.Criteria;
 import org.generals.domain.HallVO;
 import org.generals.domain.ReserveVO;
 import org.generals.mapper.ReserveMapper;
@@ -21,14 +22,21 @@ public class ReserveService {
 	@Setter(onMethod_ = { @Autowired })
 	private ReserveMapper mapper;
 
-	public void insertReserve(ReserveVO vo) {
-		mapper.insertReserve(vo);
+	public void insertReserve(ReserveVO vo) throws Exception {
+
+		if (mapper.insertReserve(vo) != 1) {
+			throw new Exception("Reservation Fail");	
+		}
 		if (vo.getArticleList() != null) {
 			mapper.insertReserveArticle(vo.getArticleList());
 		}
+		
+		
 	}
 
 	public List<HallVO> getHall() {
+		log.info("============getMapper=================");
+		log.info(mapper);
 		log.info("get Hall...........................");
 		return mapper.selectHall();
 	}
@@ -47,4 +55,21 @@ public class ReserveService {
 		log.info("get Reserve Article........................");
 		return mapper.selectReserveArticle(vo, type);
 	}
+
+	public List<ReserveVO> getList(Criteria cri) {
+		return mapper.selectReserveList(cri);
+	}
+	
+	public int getTotal(Criteria cri) {
+		return mapper.getTotal(cri);
+	}
+	
+	public ReserveVO getReserve(Long rno) {
+		return mapper.getReserve(rno);
+	}
+	
+	public List<ArticleVO> getArticleList(Long rno){
+		return mapper.selectArticleByRno(rno);
+	}
+	
 }

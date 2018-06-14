@@ -8,9 +8,10 @@
 	</select>
 	<insert id="insertReserve">
 		insert into tbl_reserve_list (hno, id, reservedate,
-		state, startTime, endTime)
+		state, starttime, endtime, message)
 		values
-		(#{hno},#{id},#{reservedate},#{state},#{startTime},#{endTime})
+		(#{hno},#{id},#{reservedate},#{state},#{startTime},#{endTime},
+		#{message})
 	</insert>
 
 	<insert id="insertReserveArticle">
@@ -20,9 +21,9 @@
 		</selectKey>
 
 		insert into tbl_reserve_article_list (rno, serial, type) values
-		<foreach collection="articleList" 
-			separator="," item="articleVO">
-			<foreach collection="articleVO.serials" item="serial" separator=",">
+		<foreach collection="articleList" separator="," item="articleVO">
+			<foreach collection="articleVO.serials" item="serial"
+				separator=",">
 				( #{rno}, #{serial}, #{articleVO.type} )
 			</foreach>
 		</foreach>
@@ -37,7 +38,7 @@
 		</foreach> </insert> -->
 
 	<select id="selectTime" resultType="org.generals.domain.ReserveVO">
-		select startTime, endTime
+		select starttime, endtime
 		from tbl_reserve_list where hno=#{hno} and
 		reservedate=#{reservedate}
 		and state=#{state}
@@ -52,20 +53,93 @@
 		select *
 		from tbl_article_list
 		where type = #{reserveVO.type} and serial not in
-		(select serial
-		from
-		(select rno
-		from tbl_reserve_list
-		where state=#{reserveVO.state} and not (startTime > #{reserveVO.endTime} or endTime <=
-		#{reserveVO.startTime})) reserve inner join tbl_reserve_article_list
-		article
-		on reserve.rno = article.rno)
+			(select serial
+			from
+				(select rno
+				from tbl_reserve_list
+				where state=#{reserveVO.state} and not (starttime > #{reserveVO.endTime} or endtime <=
+				#{reserveVO.startTime})) reserve 
+			inner join tbl_reserve_article_list
+			article
+			on reserve.rno = article.rno)
 		]]>
 	</select>
 
 	<resultMap type="org.generals.domain.ArticleVO" id="getReserveArticleSerials">
 		<id column="type" />
-		<collection property="serials" ofType="java.lang.String" javaType="java.util.ArrayList">
+		<collection property="serials" ofType="java.lang.String"
+			javaType="java.util.ArrayList">
+			<result column="serial" />
+		</collection>
+	</resultMap>
+
+	<!-- <select id="selectReserveList" resultType="org.generals.domain.ReserveVO"> 
+		select rno, hname hallVO.hname, id, reservedate, regdate, starttime, endtime 
+		from (select * from tbl_reserve_list order by reservedate desc) reserve inner 
+		join tbl_hall hall on reserve.hno = hall.hno </select> -->
+
+	<resultMap type="org.generals.domain.ReserveVO" id="reserveVO">
+		<id property="rno" column="rno" />
+		<result property="id" column="id" />
+		<result property="reservedate" column="reservedate" />
+		<result property="regdate" column="regdate" />
+		<result property="startTime" column="starttime" />
+		<result property="endTime" column="endtime" />
+		<collection property="hallVO" resultMap="hallVO"></collection>
+	</resultMap>
+
+	<resultMap type="org.generals.domain.HallVO" id="hallVO">
+		<result property="hno" column="hno" />
+		<result property="hname" column="hname" />
+		<result property="maximum" column="maximum" />
+	</resultMap>
+
+	<select id="selectReserveList" resultMap="reserveVO">
+		select *
+		from (select *
+		from tbl_reserve_list order by reservedate desc)
+		reserve inner
+		join
+		tbl_hall hall on reserve.hno = hall.hno
+		limit #{skip}, 10
+	</select>
+
+	<select id="getTotal" resultType="int">
+		select count(*)
+		from
+		tbl_reserve_list
+	</select>
+
+
+	<!-- <resultMap type="org.generals.domain.ArticleVO" id="getReserveArticle"> 
+		<id column="rno" property="rno" /> <result property="type" column="type" 
+		/> <result property="aname" column="aname" /> <collection property="serials" 
+		ofType="java.lang.String" javaType="java.util.ArrayList"> <result column="serial" 
+		/> </collection> </resultMap> <resultMap type="org.generals.domain.ReserveVO" 
+		id="getReserveVO"> <id property="rno" column="rno" /> <result property="id" 
+		column="id" /> <result property="reservedate" column="reservedate" /> <result 
+		property="regdate" column="regdate" /> <result property="startTime" column="starttime" 
+		/> <result property="endTime" column="endtime" /> <collection property="hallVO" 
+		resultMap="hallVO"></collection> <collection property="articleList" resultMap="getReserveArticle"></collection> 
+		</resultMap> <select id="getReserve" resultMap="getReserveVO"> select * from 
+		(select * from tbl_reserve_list where rno = #{rno}) reserve inner join tbl_reserve_article_list 
+		article on reserve.rno = article.rno </select> -->
+
+	<select id="selectArticleByRno" resultMap="getArticleList">
+		select rno, serial,
+		article.type, aname from
+		(select * from tbl_reserve_article_list where
+		rno = #{rno}) reserve
+		inner join tbl_article article on reserve.type =
+		article.type
+	</select>
+
+	<resultMap type="org.generals.domain.ArticleVO" id="getArticleList">
+		<id column="type" property="type" />
+		<result property="rno" column="rno" />
+		<result property="aname" column="aname" />
+		<collection property="serials" ofType="java.lang.String"
+			javaType="java.util.ArrayList">
 			<result column="serial" />
 		</collection>
 	</resultMap>

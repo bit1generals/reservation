@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ include file="./includes/header.jsp"%>
+<%@ include file="../includes/header.jsp"%>
 
 
 <style>
@@ -19,7 +19,7 @@
 				</header>
 				<div class="content">
 
-					<form method="post" action="/reserve">
+					<form method="post" action="/reserve/register">
 
 						<div class="field half first firstRow">
 							<label for="department">Lecture Room</label>
@@ -101,12 +101,7 @@
 </section>
 </div>
 </section>
-<%@include file="./includes/footer.jsp"%>
-<link rel="stylesheet"
-	href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-<script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-<style>
-</style>
+<%@include file="../includes/footer.jsp"%>
 <script>
 	var impossibleTime = [];
 	var serials = [];
@@ -121,19 +116,27 @@
 	var thirdRow = $(".thirdRow select");
 	var serialsMap = new Map();
 	
+	
+	$("#cancel").click(function(event) {
+		self.location = "/reserve/list";
+	});
+	
+	
 	$('form').submit(function(event){
 		var form = $(this);
  		var submitAllow = false;
+		
 		
 		$(".firstRow, .secondRow")
 			.find("input, select")
 			.each(function(idx,target){
 			 	var inputData = $(target);
-				console.log(inputData.data("name") + " in foreach"+inputData.val());
 				if (!$(target).val()){
 					alert(inputData.data("name")+"을 입력해주세요");
+					event.preventDefault();
 					return submitAllow;
 				}
+		
 		});
 		
 		$(".article").each(function(idx,target){
@@ -144,7 +147,6 @@
 			form.append("<input type='hidden' name='articleList["+ idx +"].type' value='"+ type +"'/>");
 			
 			for(var i = 0; i < count; i++){
-				console.dir(serialsMap.get(type)[i]);
 				form.append("<input type='hidden' name='articleList["+ idx +"].serials["+ i +"]' value='"+ serialsMap.get(type)[i] +"'/>")
 			}
 
@@ -154,26 +156,27 @@
 		return submitAllow;
 	});
 
-	$("#reservedate").datepicker({
+	reservedate.datepicker({
 		dateFormat : 'yy-mm-dd'
 	});
 
-	console.dir($('.firstRow input'));
+	//console.dir($('.firstRow input'));
+	
 	firstRow.on("change", "select,input", function(e) {
-		console.dir($(this));
+		//console.dir($(this));
 	});
+	
 	thirdRow.find('option:first').attr('selected', 'selected');
 
 	secondRow.on("change", "select", function(e) {
 		$(".thirdRow").show();
-		console.dir(thirdRow[0]);
-		console.dir(thirdRow[1]);
+		
 		thirdRow.find('option').removeAttr('selected');
 		thirdRow.find('option:first').attr('selected', 'selected');
 		articleList.children().remove();
 	});
 
-	$(".articleList").on("click", "span", function(event) {
+	articleList.on("click", "span", function(event) {
 		console.dir($(this).parent("li").remove());
 	});
 
@@ -183,7 +186,6 @@
 			return;
 		}
 		serialsMap.set(type.val(), serials.slice());
-		console.dir(serialsMap);
 		makeArticleList(value);
 		
 	});
@@ -250,10 +252,6 @@
 					targetList.each(function(idx, item) {
 						var start = new Date(item.startTime).getHours();
 						var end = new Date(item.endTime).getHours();
-						/* var start = item.starttime;
-						var end = item.endtime; */
-						console.log(start);
-						console.log(end);
 						collectTime(start, end);
 					});
 					makeStartTime();
@@ -300,11 +298,9 @@
 	function findEndTime(start) {
 		var result = 21;
 		if (impossibleTime[0] != null) {
-			console.log(impossibleTime);
 			impossibleTime.sort(function(a, b) {
 				return a - b;
 			});
-			console.log(impossibleTime);
 
 			impossibleTime.some(function(imptime) {
 				if (start < imptime) {
