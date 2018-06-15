@@ -18,11 +18,11 @@ public class PageMaker {
 	private void setUp() {
 		end = ((cri.getPage() - 1) / 10) * 10 + 10;
 		start = end - 9;
-		if (total < end * 12) {
-			end = ((total - 1) / 12) + 1;
+		if (total < end * Criteria.perPageCount) {
+			end = ((total - 1) / 10) + 1;
 		}
 		prev = start != 1 ? true : false;
-		next = end * 12 <= total ? true : false;
+		next = end * 10 <= total ? true : false;
 	}
 
 }

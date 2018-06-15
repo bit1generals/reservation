@@ -15,6 +15,8 @@ public class Criteria {
 	private int page;
 	private String type,btype;
 	private String keyword;
+	//페이지 당 게시글 수
+	public static final int perPageCount = 10;
 
 	public Criteria() {
 		this.page = 1;
@@ -25,7 +27,7 @@ public class Criteria {
 	}
 
 	public int getSkip() {
-		return (this.page-1)*10;
+		return (this.page-1)*perPageCount;
 	}
 	
 	public String[] getArr() {

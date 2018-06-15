@@ -2402,6 +2402,14 @@ table tbody tr {
 table tbody tr:nth-child(2n + 1) {
 	background-color: rgba(0, 0, 0, 0.05);
 }
+table tbody tr:nth-child(2n + 1).loadArticle {
+	background-color:rgba(222,252,182,0.2);
+}
+
+table tbody tr.loadArticle {
+	background-color:rgba(222,252,182,0.2);
+}
+
 
 table tbody tr.alt {
 	background-color: rgba(0, 0, 0, 0.05) !important;

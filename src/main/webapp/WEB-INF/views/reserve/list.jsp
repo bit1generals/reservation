@@ -5,11 +5,11 @@
 <%@ include file="../includes/header.jsp"%>
 
 <script>
+
 if(${msg ne null}){
 	alert("${msg}");
 }
 </script>
-
 <section class="wrapper style1">
 	<div class="inner">
 		<div class="index align-left">
@@ -35,7 +35,7 @@ if(${msg ne null}){
 							<tbody>
 
 								<c:forEach items="${reserveList}" var="reserveVO">
-									<tr data-rno="${reserveVO.rno}" class="rowData">
+									<tr data-rno="${reserveVO.rno}" class="rowData" data-state="false">
 										<td>${reserveVO.rno}</td>
 										<td colspan="2">${reserveVO.hallVO.hname}</td>
 										<td>${reserveVO.id}</td>
@@ -51,8 +51,9 @@ if(${msg ne null}){
 							</tbody>
 							<tfoot>
 								<tr>
-
-									<td colspan="8"><a href="/reserve/register" style="float: right;" class="button">Reservation</a></td>
+									<td colspan="5"><input style="float: right;"></td>
+									<td colspan="3"><a href="/reserve/register"
+										style="float: right;" class="button">Reservation</a></td>
 								</tr>
 							</tfoot>
 						</table>
@@ -61,20 +62,21 @@ if(${msg ne null}){
 								<ul class="pagination">
 
 									<c:if test="${pm.prev}">
-										<li><a href="/reserve/list?page=${pm.start -1}" aria-label="Previous"> <span
-												aria-hidden="true">&laquo;</span>
+										<li><a href="/reserve/list?page=${pm.start -1}"
+											aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
 										</a></li>
 									</c:if>
 
 
 									<c:forEach begin="${pm.start}" end="${pm.end}" var="num">
-										<li class=" ${param.page eq num? 'active' : ''}"><a href="/reserve/list?page=${num}">${num}</a></li>
+										<li class=" ${param.page eq num? 'active' : ''}"><a
+											href="/reserve/list?page=${num}">${num}</a></li>
 									</c:forEach>
 
 
 									<c:if test="${pm.next}">
-										<li><a href="/reserve/list?page=${pm.end +1}" aria-label="Next"> <span
-												aria-hidden="true">&raquo;</span>
+										<li><a href="/reserve/list?page=${pm.end +1}"
+											aria-label="Next"> <span aria-hidden="true">&raquo;</span>
 										</a></li>
 									</c:if>
 								</ul>
@@ -90,12 +92,52 @@ if(${msg ne null}){
 	</div>
 </section>
 <%@include file="../includes/footer.jsp"%>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.1/handlebars.js"></script>
+
+<script id="template" type="text/x-handlebars-template">
+<tr class='loadArticle'>
+	<td colspan='8'>
+		└> 
+	{{#if .}}
+		{{#each .}}
+			{{aname}} : {{this.serials.length}} 개
+		{{/each}}
+	
+	{{else}}
+           Articles was not reserved.
+	{{/if}}
+	</td>
+</tr>
+<input class='loadArticle' type='hidden'/>
+
+
+
+</script>
 <script>
 	var rowData = $(".rowData");
+	var template = Handlebars.compile($("#template").html());
+	var statement = "";
+	
 	rowData.click( function(event){
-		var hao = $(this);
-		var rno = hao.data("rno");
+		var selectedData = $(this);
+		var rno = selectedData.data("rno");
+		var state = selectedData.data("state");
+		console.log(statement);
+		console.log($(".loadArticle"));
+		$(".loadArticle").remove();
+		if(statement != rno){
+			console.log("if in! ==" + statement);
+			selectAjax(rno, selectedData);
+			statement = rno;
+		}else{
+			statement = "";
+		}
 		
+
+
+	});
+	function selectAjax(rno, selectedData){
 		$.ajax({
 			url : '/ajax/reserveArticleData?rno='+rno,
 			type : 'get',
@@ -104,21 +146,11 @@ if(${msg ne null}){
 			contentType : "application/json;charset=UTF-8",
 			success : function(articleVOList) {
 				var obj = JSON.parse(articleVOList);
-				
-				makeView(obj);
+				console.dir($(obj));
+				var html = template(obj);
+				selectedData.after(html);				
 			}
 		});
-	
-	function makeView(obj) {
+	};
 		
-		var html = "<tr><td colspan='8'>";
-		$(obj).each(function(idx,target){
-			html += " article : "+target.aname;
-		});
-		html += "</td></tr>";
-		hao.after(html);
-
-	}
-	});
-	
 </script>
